@@ -126,6 +126,7 @@ button { font-family: inherit; }
   background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
   color: #fff;
 }
+.btn-icon { vertical-align: -3px; margin-right: 6px; }
 .primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .ghost { background: #fff; border-color: var(--line); color: var(--ink); }
 .ghost:disabled { opacity: 0.5; cursor: not-allowed; }
