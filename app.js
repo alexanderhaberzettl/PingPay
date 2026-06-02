@@ -149,24 +149,15 @@ const els = {
   name: $("#name"),
   note: $("#note"),
   bic: $("#bic"),
-  bicField: $("#bic-field"),
   bicHint: $("#bic-hint"),
-  bankRadios: () => document.querySelectorAll('input[name="bank"]'),
   sendBtn: $("#send-btn"),
   saveFavBtn: $("#save-fav-btn"),
   result: $("#result"),
-  resultGeorge: $("#result-george"),
-  resultQr: $("#result-qr"),
   georgeLink: $("#george-link"),
   qrCanvas: $("#qr-canvas"),
   qrCaption: $("#qr-caption"),
   installBtn: $("#install-btn")
 };
-
-function selectedBank() {
-  const checked = document.querySelector('input[name="bank"]:checked');
-  return checked ? checked.value : "george";
-}
 
 function validate() {
   const amount = parseAmount(els.amount.value);
@@ -179,19 +170,12 @@ function validate() {
   els.ibanErr.textContent = els.iban.value && !ibanOk ? "This IBAN looks invalid." : "";
   els.iban.classList.toggle("invalid", !!els.iban.value && !ibanOk);
 
-  const bank = selectedBank();
-  const bicOk = bank === "george" || normalizeIban(els.bic.value).length >= 8;
+  // The QR code is always generated, so a BIC is always required.
+  const bicOk = normalizeIban(els.bic.value).length >= 8;
 
   els.sendBtn.disabled = !(amountOk && ibanOk && bicOk);
   els.saveFavBtn.disabled = !ibanOk;
-  return { amount, amountOk, ibanOk, bicOk, bank };
-}
-
-function syncBankUi() {
-  const isOther = selectedBank() === "other";
-  els.bicField.hidden = !isOther;
-  if (isOther) maybeAutofillBic();
-  validate();
+  return { amount, amountOk, ibanOk, bicOk };
 }
 
 function maybeAutofillBic() {
@@ -225,22 +209,15 @@ async function shareOrFallback(shareData, fallback) {
   return false;
 }
 
-function showGeorge(link) {
+// Holds the most recently created reminder so the share/copy buttons can reuse it.
+let currentReminder = null;
+
+function showReminder(amount, note, link) {
   els.result.hidden = false;
-  els.resultGeorge.hidden = false;
-  els.resultQr.hidden = true;
+  const caption = `€${formatAmount(amount)}` + (note ? ` · ${note}` : "");
+  els.qrCaption.textContent = caption;
   els.georgeLink.textContent = link;
   els.georgeLink.href = link;
-  els.result.scrollIntoView({ behavior: "smooth", block: "nearest" });
-}
-
-function showQr(payload, amount, note) {
-  els.result.hidden = false;
-  els.resultGeorge.hidden = true;
-  els.resultQr.hidden = false;
-  renderQrToCanvas(payload, els.qrCanvas);
-  const caption = `€${formatAmount(amount)}` + (note ? ` · ${note}` : "");
-  els.qrCaption.textContent = caption + "\nScan with your banking app to pay.";
   els.result.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
@@ -249,40 +226,44 @@ function handleSubmit(e) {
   const state = validate();
   if (els.sendBtn.disabled) return;
 
-  if (state.bank === "george") {
-    const link = buildGeorgeLink(els.iban.value, state.amount);
-    showGeorge(link);
-    shareGeorge(link, state.amount);
-  } else {
-    const note = els.note.value.trim();
-    const payload = buildEpcPayload({
-      bic: normalizeIban(els.bic.value),
-      name: els.name.value.trim(),
-      iban: els.iban.value,
-      amount: state.amount,
-      note
-    });
-    showQr(payload, state.amount, note);
-  }
+  const amount = state.amount;
+  const note = els.note.value.trim();
+  const link = buildGeorgeLink(els.iban.value, amount);
+  const payload = buildEpcPayload({
+    bic: normalizeIban(els.bic.value),
+    name: els.name.value.trim(),
+    iban: els.iban.value,
+    amount,
+    note
+  });
+
+  renderQrToCanvas(payload, els.qrCanvas);
+  currentReminder = { amount, note, link };
+  showReminder(amount, note, link);
 }
 
-function shareGeorge(link, amount) {
-  const text = `Please pay me back €${formatAmount(amount)} — open in George:`;
-  shareOrFallback(
-    { title: "PingPay reminder", text, url: link },
-    () => { copyText(link, "Link copied — paste it to send."); }
-  );
+function reminderShareText() {
+  if (!currentReminder) return "";
+  const { amount, note, link } = currentReminder;
+  let text = `Please pay me back €${formatAmount(amount)}`;
+  if (note) text += ` (${note})`;
+  text += ". Scan the QR code, or if you have the George app installed, use this link: " + link;
+  return text;
 }
 
-async function shareQrImage() {
+async function shareReminder() {
+  if (!currentReminder) return;
   const file = await canvasToPngFile(els.qrCanvas, "pingpay-qr.png");
-  const text = els.qrCaption.textContent.replace(/\n/g, " ");
+  const text = reminderShareText();
   const data = { files: [file], title: "PingPay reminder", text };
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    const ok = await shareOrFallback(data, downloadQr);
-    if (!ok) return;
+    await shareOrFallback(data, () => copyText(text, "Reminder copied — paste it to send."));
   } else {
-    downloadQr();
+    // No image sharing available — share the text + link instead.
+    await shareOrFallback(
+      { title: "PingPay reminder", text, url: currentReminder.link },
+      () => copyText(text, "Reminder copied — paste it to send.")
+    );
   }
 }
 
@@ -347,7 +328,8 @@ function applyFavorite(fav) {
   els.name.value = fav.name || "";
   if (fav.bic) { els.bic.value = fav.bic; els.bic.dataset.auto = "0"; }
   else { els.bic.value = ""; els.bic.dataset.auto = "1"; }
-  syncBankUi();
+  maybeAutofillBic();
+  validate();
   els.amount.focus();
   toast(`Loaded ${fav.label || fav.name || "favorite"}.`);
 }
@@ -395,12 +377,12 @@ function onboardingSteps() {
       body: "Send anyone a quick reminder to pay you back — as a link or a scannable QR code."
     },
     {
-      title: "Two ways to get paid",
-      body: "Pick George to send a link that opens the George app with your amount and IBAN prefilled. Pick Other to create a QR code any European banking app can scan."
+      title: "One reminder, two ways to pay",
+      body: "PingPay always creates a QR code any European banking app can scan — and a George link, so anyone with the George app can pay with a single tap."
     },
     {
       title: "Fill in & share",
-      body: "Enter an amount and your IBAN, add an optional note, then tap Send to share it through your phone's share sheet. Save accounts as favorites for next time."
+      body: "Enter an amount and your IBAN, add an optional note, then tap Create to share it through your phone's share sheet. Save accounts as favorites for next time."
     }
   ];
   if (!isStandalone()) {
@@ -480,18 +462,13 @@ function init() {
     if (isValidIban(els.iban.value)) els.iban.value = groupIban(els.iban.value);
   });
   els.bic.addEventListener("input", () => { els.bic.dataset.auto = "0"; validate(); });
-  els.bankRadios().forEach((r) => r.addEventListener("change", syncBankUi));
 
   els.form.addEventListener("submit", handleSubmit);
   els.saveFavBtn.addEventListener("click", saveFavorite);
 
-  $("#share-george").addEventListener("click", () => {
-    const amount = parseAmount(els.amount.value);
-    shareGeorge(els.georgeLink.href, amount);
-  });
+  $("#share-btn").addEventListener("click", shareReminder);
   $("#copy-george").addEventListener("click", () =>
     copyText(els.georgeLink.href, "Link copied — paste it to send."));
-  $("#share-qr").addEventListener("click", shareQrImage);
   $("#download-qr").addEventListener("click", downloadQr);
 
   // Onboarding
@@ -512,7 +489,7 @@ function init() {
   });
 
   renderFavorites();
-  syncBankUi();
+  maybeAutofillBic();
   validate();
 
   if (!readJSON(STORE.onboarded, false)) openOnboarding();

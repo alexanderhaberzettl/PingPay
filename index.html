@@ -67,53 +67,37 @@
         <input id="note" type="text" maxlength="140" placeholder="e.g. Dinner, Taxi…" />
       </label>
 
-      <!-- Bank choice -->
-      <fieldset class="field choice">
-        <legend>Send via</legend>
-        <div class="segmented" role="radiogroup" aria-label="Send via">
-          <input type="radio" name="bank" id="bank-george" value="george" checked />
-          <label for="bank-george">George</label>
-          <input type="radio" name="bank" id="bank-other" value="other" />
-          <label for="bank-other">Other (QR)</label>
-        </div>
-      </fieldset>
-
-      <!-- BIC (only relevant for QR / Other) -->
-      <label class="field" id="bic-field" hidden>
+      <!-- BIC (used for the QR code; auto-filled from the IBAN) -->
+      <label class="field" id="bic-field">
         <span>BIC <em id="bic-hint"></em></span>
         <input id="bic" type="text" autocapitalize="characters" autocomplete="off"
                spellcheck="false" placeholder="Auto-filled from IBAN" />
       </label>
 
       <div class="actions">
-        <button type="submit" id="send-btn" class="primary" disabled>Send reminder</button>
+        <button type="submit" id="send-btn" class="primary" disabled>Create reminder</button>
         <button type="button" id="save-fav-btn" class="ghost" disabled>Save favorite</button>
       </div>
     </form>
 
     <!-- Result -->
     <section id="result" class="card result" hidden aria-live="polite">
-      <div id="result-george" hidden>
-        <h2>George link ready</h2>
-        <p class="muted">Tap “Share” to send it. The recipient opens it in George with the amount and IBAN prefilled.</p>
+      <h2>Reminder ready</h2>
+      <p class="muted">Scan the QR code with any banking app to pay.</p>
+      <div class="qr-box">
+        <canvas id="qr-canvas" width="320" height="320" aria-label="Payment QR code"></canvas>
+      </div>
+      <p id="qr-caption" class="qr-caption"></p>
+
+      <div class="george-note">
+        <p class="muted">If you have the George app installed, you can also use the following link:</p>
         <a id="george-link" class="link-pill" href="#" target="_blank" rel="noopener"></a>
-        <div class="actions">
-          <button type="button" id="share-george" class="primary">Share link</button>
-          <button type="button" id="copy-george" class="ghost">Copy link</button>
-        </div>
+        <button type="button" id="copy-george" class="ghost copy-link">Copy link</button>
       </div>
 
-      <div id="result-qr" hidden>
-        <h2>QR code ready</h2>
-        <p class="muted">Share or save the image. The recipient scans it with their banking app to pay you.</p>
-        <div class="qr-box">
-          <canvas id="qr-canvas" width="320" height="320" aria-label="Payment QR code"></canvas>
-        </div>
-        <p id="qr-caption" class="qr-caption"></p>
-        <div class="actions">
-          <button type="button" id="share-qr" class="primary">Share image</button>
-          <button type="button" id="download-qr" class="ghost">Download</button>
-        </div>
+      <div class="actions">
+        <button type="button" id="share-btn" class="primary">Share reminder</button>
+        <button type="button" id="download-qr" class="ghost">Download QR</button>
       </div>
     </section>
 
