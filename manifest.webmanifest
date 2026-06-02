@@ -1,0 +1,16 @@
+{
+  "name": "PingPay",
+  "short_name": "PingPay",
+  "description": "Send a payment reminder link or QR code so people can pay you back.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0FB6A0",
+  "theme_color": "#16B073",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

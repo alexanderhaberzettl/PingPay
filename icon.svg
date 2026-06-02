@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22C272"/>
+      <stop offset="1" stop-color="#0FB6A0"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#DFF7EC"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#bg)"/>
+
+  <!-- Rays above the coin -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="34" stroke-linecap="round">
+    <line x1="512" y1="150" x2="512" y2="232"/>
+    <line x1="372" y1="196" x2="408" y2="268"/>
+    <line x1="652" y1="196" x2="616" y2="268"/>
+  </g>
+
+  <!-- Inbox / tray -->
+  <path fill="#FFFFFF" d="
+    M300 470
+    a40 40 0 0 1 40 40
+    v92
+    h120
+    a52 52 0 0 0 104 0
+    h120
+    v-92
+    a40 40 0 0 1 80 0
+    v250
+    a60 60 0 0 1 -60 60
+    H280
+    a60 60 0 0 1 -60 -60
+    V510
+    a40 40 0 0 1 40 -40
+    z"/>
+  <!-- Inner tray fill (subtle) -->
+  <path fill="#BFEFD8" opacity="0.85" d="
+    M340 640
+    h104
+    a68 68 0 0 0 136 0
+    h104
+    v160
+    H340
+    z"/>
+
+  <!-- Coin -->
+  <circle cx="512" cy="470" r="160" fill="url(#coin)"/>
+  <text x="512" y="540" font-family="Arial, Helvetica, sans-serif" font-size="230"
+        font-weight="700" fill="#19A56A" text-anchor="middle">$</text>
+
+  <!-- Wordmark -->
+  <text x="512" y="930" font-family="Arial, Helvetica, sans-serif" font-size="150"
+        font-weight="700" fill="#FFFFFF" text-anchor="middle">PingPay</text>
+</svg>
