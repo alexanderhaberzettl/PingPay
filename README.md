@@ -44,7 +44,7 @@ Deploy from a branch** and point it at this branch's root.
 **George link**
 
 ```
-https://www.sparkasse.at/erstebank/privatkunden#/new-transfer?IBAN=<IBAN>&AM=<amount>&CC=EUR
+https://www.sparkasse.at/r/erstebank/privatkunden#/new-transfer?IBAN=<IBAN>&AM=<amount>&CC=EUR
 ```
 
 **EPC QR payload** (UTF-8, line-separated)

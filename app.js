@@ -4,7 +4,7 @@
  * PingPay — payment reminder PWA
  * ============================================================ */
 
-const GEORGE_BASE = "https://www.sparkasse.at/erstebank/privatkunden#/new-transfer";
+const GEORGE_BASE = "https://www.sparkasse.at/r/erstebank/privatkunden#/new-transfer";
 
 /* Austrian Bankleitzahl (5 digits after the check digits) -> BIC.
  * Small curated table of common banks; unknown codes fall back to manual entry.
