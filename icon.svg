@@ -10,8 +10,8 @@
     </linearGradient>
   </defs>
 
-  <!-- Background -->
-  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#bg)"/>
+  <!-- Background (full-bleed: the OS applies its own rounded mask) -->
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#bg)"/>
 
   <!-- Rays above the coin -->
   <g fill="none" stroke="#FFFFFF" stroke-width="34" stroke-linecap="round">
