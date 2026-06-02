@@ -161,6 +161,11 @@ button { font-family: inherit; }
 #qr-canvas { width: 280px; height: 280px; max-width: 80vw; image-rendering: pixelated;
   background: #fff; border-radius: 12px; }
 .qr-caption { text-align: center; color: var(--muted); font-size: 0.85rem; white-space: pre-line; }
+.signal-hint {
+  margin: 14px 0 0; padding: 10px 12px; border-radius: 10px;
+  background: #fff8e6; border: 1px solid #f0e0a8; color: #7a5d00;
+  font-size: 0.82rem; line-height: 1.45;
+}
 
 /* Install button */
 .install-btn {
